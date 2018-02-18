@@ -12,12 +12,14 @@ public class Combinations {
         itemsList.add(4);
         itemsList.add(5);
         itemsList.add(6);
-        Integer expectedSum=6;
-       System.out.println(new Combinations().determineCombinations(itemsList,expectedSum));
+        Integer expectedSum=12;
+        Combinations combo=new Combinations();
+        System.out.println(combo.determineCombinations(itemsList,expectedSum));
 
     }
 
     private List<List<Integer>> determineCombinations(final List<Integer> listOfItems,final Integer expectedSum){
+
         final List<List<Integer>> combinationsResultingInSum=new ArrayList<List<Integer>>();
         //sorting the items will introduce significance performance improvement by eliminating multiple loops
         Collections.sort(listOfItems);
@@ -33,20 +35,19 @@ public class Combinations {
                 Integer innerIterationStartPos=0;
                 while (innerIterationStartPos<toBeIteratedItems.size()){
                     validCombination= buildCombination(beginningItem, toBeIteratedItems,expectedSum, iterationWidth,innerIterationStartPos );
-                    if(! validCombination.isEmpty()){
+                    if(! validCombination.isEmpty()&& canAddSolution(combinationsResultingInSum,validCombination)){
                         combinationsResultingInSum.add(validCombination);
                     }
                     innerIterationStartPos=innerIterationStartPos+1;
                 }
-            iterationWidth=iterationWidth+1;
+                iterationWidth=iterationWidth+1;
             }
         }
-       return combinationsResultingInSum;
+        return combinationsResultingInSum;
     }
 
     private List<Integer> buildCombination(final Integer beginningItem,final List<Integer> toBeIteratedItemsList,
                                            final Integer expectedSum,final Integer iterationWidth,Integer iterationIndex ){
-
 
         Integer growingSum=0;
         Integer traversedDepth=0;
@@ -64,7 +65,7 @@ public class Combinations {
                         validCombination.add(iteratedItem);
                         traversedDepth = traversedDepth+1;
                         if(traversedDepth.intValue() != iterationWidth.intValue()){
-                           validCombination.clear();
+                            validCombination.clear();
                         }
                         return validCombination;
                     } else if (growingSum.intValue() > expectedSum.intValue()) {
@@ -85,8 +86,26 @@ public class Combinations {
         return validCombination;
     }
 
+    private Boolean canAddSolution(final List<List<Integer>> combinationsList,final List<Integer> solutions){
+
+        Boolean canAddToBucket=Boolean.TRUE;
+        if(!combinationsList.isEmpty()) {
+            Iterator iterator = combinationsList.iterator();
+            while (iterator.hasNext()) {
+                List<Integer> combinationData = (List<Integer>) iterator.next();
+                if (combinationData.size() == solutions.size()) {
+                    if (combinationData.containsAll(solutions))
+                        return Boolean.FALSE;
+
+                }
+            }
+        }
+        return canAddToBucket;
+    }
+
     private List<Integer> determineEligibleItems(final List<List<Integer>> combinationsResultingInSum,
                                                  final List<Integer> listOfItems,final Integer expectedSum){
+
         final List<Integer> eligibleItems=new ArrayList<Integer>();
         final List<Integer> validCombination=new ArrayList<Integer>();
         for (final Integer listItem: listOfItems) {
